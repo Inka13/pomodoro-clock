@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href="https://fonts.googleapis.com/css?family=Play" rel="stylesheet">
+<style>
+body {
+
+	font-family: Play;
+}
+#container {
+	/*border: 1px solid black;
+	*/padding: 20px 0 20px 0;
+	width:30%;
+	margin-left: 35%;
+	margin-top: 10px;
+
+}
+#options {
+	display: flex;
+	flex-wrap: wrap;
+	text-align: center;
+	font-size: 40px;
+}
+
+#btext, #stext {
+	width: 50%;
+}
+#btext {
+	text-align: left;
+}
+#stext {
+	text-align: right;
+}
+.set {
+	width:10%;
+}
+.numbreak, .numsession {
+	width: 20%;
+}
+#tomato {
+	width:100%;
+	z-index: -1;
+}
+#cover {
+	position: relative;
+	width: 100%;
+	height: 1px;
+	background-color: rgba(250,250,250,0.6);
+	margin-top: -225px;
+	z-index: 2;
+}
+#time {
+	position: relative;
+	width: 100%;
+	height: 55px;
+	background-color: rgba(250,250,250,0);
+	margin-top: -200px;
+	text-align: center;
+	color:white;
+	font-size: 50px;
+	z-index: 3;
+}
+
+
+@media (max-width: 1080px) {
+	#container {
+	width:40%;
+	margin-left: 30%;
+
+}
+}
+
+</style>
+<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+--></head>
+<body>
+
+<div id="container">
+
+	<div id="options">
+		<div id="btext">Break</div>
+		<div id="stext">Session</div>
+		<div class="set break"><</div>
+		<div class="numbreak">2</div>
+		<div class="set break">></div>
+		<div class="numbreak"></div>
+		<div class="set session"><</div>
+		<div class="numsession">1</div>
+		<div class="set session">></div>
+	</div>
+	<img  id="tomato" src="https://clipartion.com/wp-content/uploads/2015/11/dessert-clip-art-830x787.jpg">
+
+    <div id="time">25:00</div>
+    <div id="cover"></div>
+
+</div>
+<script>
+	function displayTimeLeft(seconds) {
+	minutes = Math.floor(seconds / 60);
+	remainderSeconds = seconds % 60;
+	const display = `${minutes}:${remainderSeconds < 10 ? '0' : ''}${remainderSeconds}`;
+	time.textContent = display;
+    }
+    function playSoundClick() {
+
+      const audio = document.querySelector(`audio[id="sessionsound"]`);
+
+      if (!audio)  return;
+      // stop the function from running all together
+
+      audio.currentTime = 0; // rewind to the start
+      audio.play();
+
+    }
+	function timer(m) {
+		active=true;
+		if(sessionmode>0) {
+        		stext.style.textShadow="0px 0px 10px rgba(255,0,0,0.9)";
+        		btext.style.textShadow='none';
+     		 } else {
+     		 	btext.style.textShadow='0px 0px 10px rgba(255,0,0,0.9)';
+        		stext.style.textShadow='none';
+     		 }
+		var now=Date.now();
+
+		if(change==false) {
+			var arr=time.textContent.split(':');
+			var seconds=parseInt(arr[0])*60 + parseInt(arr[1]);
+			var then = now + seconds * 1000;
+			displayTimeLeft(seconds);
+
+		}
+		if(change==true) {
+			var then = now + m * 60 * 1000;
+			displayTimeLeft(m*60);
+			height=0;
+			visinafragmenta=355/(m*60);
+		}
+		change=true;
+		countdown = setInterval(() => {
+		const secondsLeft = Math.round((then - Date.now()) /1000);
+		height=Math.round((height+visinafragmenta) * 100) / 100;
+		var pxedheight=height+'px';
+		cover.style.height = pxedheight;
+		if(secondsLeft < 1) {
+			clearInterval(countdown);
+			sessionmode = sessionmode*(-1);
+			if(sessionmode<0) {
+				var minutes = parseInt(breaktime.textContent);
+			} else {
+				var minutes = parseInt(sessiontime.textContent);
+			}
+			height=0;
+			timer(minutes);
+			return;
+		}
+		displayTimeLeft(secondsLeft);
+
+	}, 1000);
+	}
+	function startTimer() {
+		if(active==true) {
+			clearInterval(countdown);
+			active=false;
+			change=false;
+			return;
+		}
+		if(sessionmode<0) {
+				var minutes = parseInt(breaktime.textContent);
+			} else {
+				var minutes = parseInt(sessiontime.textContent);
+			}
+		timer(minutes);
+
+	}
+	function setValues() {
+		if(active==true) return;
+		if(this.textContent==='<' && this.classList.contains('break')) {
+			if(parseInt(breaktime.textContent)>1) {
+				breaktime.textContent=parseInt(breaktime.textContent)-1;
+				if(sessionmode<0) {
+					change=true;
+				}
+			}
+		}
+		if(this.textContent==='>' && this.classList.contains('break')) {
+			if(parseInt(breaktime.textContent)<60) {
+				breaktime.textContent=parseInt(breaktime.textContent)+1;
+				if(sessionmode<0) {
+					change=true;
+				}
+			}
+		}
+		if(this.textContent==='<' && this.classList.contains('session')) {
+			if(parseInt(sessiontime.textContent)>1) {
+				sessiontime.textContent=parseInt(sessiontime.textContent)-1;
+				if(sessionmode>0) {
+					change=true;
+				}
+			}
+		}
+		if(this.textContent==='>' && this.classList.contains('session')) {
+			if(parseInt(sessiontime.textContent)<60) {
+				sessiontime.textContent=parseInt(sessiontime.textContent)+1;
+				if(sessionmode>0) {
+					change=true;
+				}
+			}
+		}
+
+	}
+	var height=0;
+	let countdown;
+	let active=false;
+	let change=true;
+	let sessionmode=1;
+	var visinafragmenta;
+	const time=document.querySelector('#time');
+	const cover=document.querySelector('#cover');
+	const breaktime=document.querySelector('.numbreak');
+	const sessiontime=document.querySelector('.numsession');
+	const changes=document.querySelectorAll('.set');
+	const stext=document.querySelector('#stext');
+	const btext=document.querySelector('#btext');
+
+	changes.forEach(change => change.addEventListener('click', setValues));
+	const image=document.querySelector('img');
+	image.addEventListener('click', startTimer);
+	cover.addEventListener('click', startTimer);
+	time.addEventListener('click', startTimer);
+	console.log(cover.style.height);
+</script>
+
+</body>
+</html>
