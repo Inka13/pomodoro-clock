@@ -4,9 +4,6 @@
 
 <h4>Used tehnologies: HTML, CSS, Javascript</h4>
 
-<h4>Used tehnologies: HTML, CSS, Javascript<h4>
-
-
 <p>User Stories:</p> 
 
 <ol>
